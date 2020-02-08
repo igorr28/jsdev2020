@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 /* ДЗ 2 - работа с массивами и объектами */
 
 /*
@@ -7,6 +8,9 @@
  Посмотрите как работает forEach и повторите это поведение для массива, который будет передан в параметре array
  */
 function forEach(array, fn) {
+    for (let i = 0; i < array.length; i++) {
+        fn(array[i], i, array);
+    }
 }
 
 /*
@@ -16,8 +20,15 @@ function forEach(array, fn) {
  Посмотрите как работает map и повторите это поведение для массива, который будет передан в параметре array
  */
 function map(array, fn) {
-}
+    
+    let modifiedArr = [];
 
+    for (let i = 0; i < array.length; i++) {
+        modifiedArr.push(fn(array[i], i, array));
+    }
+
+    return modifiedArr;
+}
 /*
  Задание 3:
 
@@ -25,6 +36,23 @@ function map(array, fn) {
  Посмотрите как работает reduce и повторите это поведение для массива, который будет передан в параметре array
  */
 function reduce(array, fn, initial) {
+    let prev;
+
+    if (initial !== undefined) {
+        prev = initial;
+        for (let i = 0; i < array.length; i++) {
+            prev = fn(prev, array[i], i, array);
+        }
+
+        return prev;
+    } 
+    prev = array[0];
+    for (let i = 1; i < array.length; i++) {
+        prev = fn(prev, array[i], i, array);
+    }
+
+    return prev;   
+    
 }
 
 /*
@@ -36,6 +64,13 @@ function reduce(array, fn, initial) {
    upperProps({ name: 'Сергей', lastName: 'Петров' }) вернет ['NAME', 'LASTNAME']
  */
 function upperProps(obj) {
+    let arrProps = [];
+
+    for (let key in obj) {
+        arrProps.push(key.toUpperCase());
+    }
+
+    return arrProps;
 }
 
 /*
