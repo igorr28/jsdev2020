@@ -45,8 +45,79 @@ const listTable = homeworkContainer.querySelector('#list-table tbody');
 
 filterNameInput.addEventListener('keyup', function() {
     // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+    let filterValue = this.value;
+    let rows = listTable.children;
+
+    for (let i = 0; i < rows.length; i++) { 
+        let name = rows[i].children[0].innerHTML;
+        let value = rows[i].children[1].innerHTML;
+
+        if (!(name.includes(filterValue) || value.includes(filterValue))) {         
+            rows[i].style.display = 'none';         
+        } else {
+            rows[i].style.display = '';
+        }        
+    }   
 });
 
 addButton.addEventListener('click', () => {
     // здесь можно обработать нажатие на кнопку "добавить cookie"
+    let name = addNameInput.value;
+    let value = addValueInput.value;
+    let rows = listTable.children;
+    let isAdd = false;
+   
+    for (let i = 0; i < rows.length; i++) {     
+        if (rows[i].firstElementChild.innerHTML === name) {
+            
+            rows[i].children[1].innerHTML = value;
+            isAdd = true;
+            document.cookie = `${name}=${value}`;
+        }         
+    }   
+    
+    if (!isAdd) {
+        addRow(name, value);
+        document.cookie = `${name}=${value}`;
+    }
+
+    // addNameInput.value = '';
+    // addValueInput.value = '';
 });
+
+listTable.addEventListener('click', function(e) {
+    // удаление строки из таблицы
+    let target = e.target;
+
+    if (target.tagName === 'BUTTON') {
+        let key = target.closest('tr').firstElementChild.innerHTML;
+
+        document.cookie = `${key}=; max-age=0`;
+        target.closest('tr').remove();
+    }
+});
+
+function getCookies() {
+    let obj = document.cookie.split('; ').reduce((prev, current) => {
+        const [name, value] = current.split('=');
+
+        prev[name] = value;
+
+        return prev;
+    }, {});    
+
+    return obj;
+}
+
+function addRow(name, value) {
+    let row = `<tr><td>${name}</td><td>${value}</td><td><button class="delete">Удалить</button></td></tr>`;
+
+    listTable.innerHTML += row;
+
+}
+
+let objCookies = getCookies();
+
+for (let key in objCookies) {
+    addRow(key, objCookies[key]);
+}
