@@ -30,6 +30,17 @@
  */
 const homeworkContainer = document.querySelector('#homework-container');
 
+/* Блок с надписью "Загрузка" */
+const loadingBlock = homeworkContainer.querySelector('#loading-block');
+/* Блок с текстовым полем и результатом поиска */
+const filterBlock = homeworkContainer.querySelector('#filter-block');
+/* Текстовое поле для поиска по городам */
+const filterInput = homeworkContainer.querySelector('#filter-input');
+/* Блок с результатами поиска */
+const filterResult = homeworkContainer.querySelector('#filter-result');
+/* Кнопка "Повторить" */
+const reloadBtn = homeworkContainer.querySelector('#reload-btn');
+
 /*
  Функция должна вернуть Promise, который должен быть разрешен с массивом городов в качестве значения
 
@@ -37,6 +48,36 @@ const homeworkContainer = document.querySelector('#homework-container');
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
 function loadTowns() {
+    return new Promise((resolve, reject) => {
+        fetch('https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json')
+            .then(response => {
+                if (response.ok) {
+                    let towns = response.json();                   
+                    
+                    return towns;                    
+                }                     
+                reject('Не удалось загрузить города');                 
+            })
+            .then (towns => {
+                towns.sort((a, b) => {
+                    if (a.name > b.name) {
+                        return 1; 
+                    }
+                    if (a.name === b.name) {
+                        return 0; 
+                    } 
+                    if (a.name < b.name) {
+                        return -1; 
+                    } 
+            
+                    return towns;
+                });
+                
+                resolve(towns);
+            })            
+            
+    });
+    
 }
 
 /*
@@ -51,20 +92,55 @@ function loadTowns() {
    isMatching('Moscow', 'Moscov') // false
  */
 function isMatching(full, chunk) {
+    return full.toLowerCase().includes(chunk.toLowerCase());
 }
 
-/* Блок с надписью "Загрузка" */
-const loadingBlock = homeworkContainer.querySelector('#loading-block');
-/* Блок с текстовым полем и результатом поиска */
-const filterBlock = homeworkContainer.querySelector('#filter-block');
-/* Текстовое поле для поиска по городам */
-const filterInput = homeworkContainer.querySelector('#filter-input');
-/* Блок с результатами поиска */
-const filterResult = homeworkContainer.querySelector('#filter-result');
+loadTowns()
+    .then(towns => {      
 
-filterInput.addEventListener('keyup', function() {
-    // это обработчик нажатия кливиш в текстовом поле
-});
+        loadingBlock.style.display = 'none';
+        filterBlock.style.display = 'block';
+
+        filterInput.addEventListener('keyup', function() {
+            // это обработчик нажатия кливиш в текстовом поле
+            let str = this.value;
+
+            if (!str) {
+                filterResult.innerHTML = '';
+            } else {
+                let filterTowns = towns.filter(item => {
+                    return isMatching(item.name, str);
+                }); 
+
+                filterResult.innerHTML = '';
+    
+                // let ul = document.createElement('ul');
+
+                for (let i = 0; i < filterTowns.length; i++) {        
+                    // let li = document.createElement('li');
+
+                    // li.textContent = filterTowns[i].name;
+                    // ul.appendChild(li);
+
+                    // filterResult.appendChild(ul);
+                    let div = document.createElement('div');
+
+                    div.textContent = filterTowns[i].name;
+                    filterResult.appendChild(div);                    
+                }
+            }        
+            
+        });
+
+    })
+    .catch(error => {        
+        loadingBlock.textContent = error;
+        reloadBtn.style.display = 'block';
+        reloadBtn.addEventListener('click', function() {
+            console.log('Reload'); 
+            location.reload();        
+        });
+    } );
 
 export {
     loadTowns,
