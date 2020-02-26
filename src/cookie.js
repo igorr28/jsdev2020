@@ -1,3 +1,4 @@
+
 /*
  ДЗ 7 - Создать редактор cookie с возможностью фильтрации
 
@@ -43,46 +44,59 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
+let objCookies;
+
 filterNameInput.addEventListener('keyup', function() {
     // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
-    let filterValue = this.value;
-    let rows = listTable.children;
-
-    for (let i = 0; i < rows.length; i++) { 
-        let name = rows[i].children[0].innerHTML;
-        let value = rows[i].children[1].innerHTML;
-
-        if (!(name.includes(filterValue) || value.includes(filterValue))) {         
-            rows[i].style.display = 'none';         
-        } else {
-            rows[i].style.display = '';
-        }        
-    }   
+    let filterValue = filterNameInput.value;   
+    
+    listTable.innerHTML = '';    
+    
+    if (filterValue === '') {
+        for (let key in objCookies) {
+            addRow(key, objCookies[key]);           
+        }
+    } else {
+        for (let key in objCookies) {            
+            if (key.includes(filterValue) || objCookies[key].includes(filterValue)) {
+                addRow(key, objCookies[key]);                
+            }
+        }
+    }    
 });
 
 addButton.addEventListener('click', () => {
     // здесь можно обработать нажатие на кнопку "добавить cookie"
     let name = addNameInput.value;
-    let value = addValueInput.value;
-    let rows = listTable.children;
-    let isAdd = false;
-   
-    for (let i = 0; i < rows.length; i++) {     
-        if (rows[i].firstElementChild.innerHTML === name) {
-            
-            rows[i].children[1].innerHTML = value;
-            isAdd = true;
-            document.cookie = `${name}=${value}`;
-        }         
-    }   
-    
-    if (!isAdd) {
-        addRow(name, value);
-        document.cookie = `${name}=${value}`;
-    }
+    let value = addValueInput.value;    
+    let filterValue = filterNameInput.value;
 
-    // addNameInput.value = '';
-    // addValueInput.value = '';
+    if (name !== '' && value !== '') {
+        for (let key in objCookies) {     
+            if (key === name) {                    
+                delete objCookies[key];                 
+            }         
+        }
+        objCookies[name] = value;
+        document.cookie = `${name}=${value}`;        
+    } 
+
+    listTable.innerHTML = '';
+    
+    if (filterValue === '') {
+    
+        for (let key in objCookies) {     
+            addRow(key, objCookies[key]);      
+        }
+    } else {
+        for (let key in objCookies) {
+            
+            if (key.includes(filterValue) || objCookies[key].includes(filterValue)) {
+                addRow(key, objCookies[key]); 
+            }                  
+        }
+    }
+    
 });
 
 listTable.addEventListener('click', function(e) {
@@ -113,11 +127,12 @@ function addRow(name, value) {
     let row = `<tr><td>${name}</td><td>${value}</td><td><button class="delete">Удалить</button></td></tr>`;
 
     listTable.innerHTML += row;
-
 }
 
-let objCookies = getCookies();
+objCookies = getCookies();
 
 for (let key in objCookies) {
-    addRow(key, objCookies[key]);
+    if (key) {
+        addRow(key, objCookies[key]);
+    }    
 }
