@@ -54,7 +54,9 @@ filterNameInput.addEventListener('keyup', function() {
     
     if (filterValue === '') {
         for (let key in objCookies) {
-            addRow(key, objCookies[key]);           
+            if (objCookies.hasOwnProperty(key)) {
+                addRow(key, objCookies[key]);            
+            }                       
         }
     } else {
         for (let key in objCookies) {            
@@ -79,14 +81,16 @@ addButton.addEventListener('click', () => {
         }
         objCookies[name] = value;
         document.cookie = `${name}=${value}`;        
-    } 
+    }     
 
     listTable.innerHTML = '';
     
     if (filterValue === '') {
     
-        for (let key in objCookies) {     
-            addRow(key, objCookies[key]);      
+        for (let key in objCookies) { 
+            if (objCookies.hasOwnProperty(key)) {
+                addRow(key, objCookies[key]);            
+            }       
         }
     } else {
         for (let key in objCookies) {
