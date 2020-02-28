@@ -48,7 +48,9 @@ let objCookies;
 
 filterNameInput.addEventListener('keyup', function() {
     // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
-    let filterValue = filterNameInput.value;   
+    let filterValue = filterNameInput.value; 
+
+    objCookies = getCookies();  
     
     listTable.innerHTML = '';    
     
@@ -73,7 +75,9 @@ addButton.addEventListener('click', () => {
     let value = addValueInput.value;    
     let filterValue = filterNameInput.value;
 
-    if (name !== '' && value !== '') {
+    objCookies = getCookies();
+
+    if (name !== '' && value !== '' ) {
         for (let key in objCookies) {     
             if (key === name) {                    
                 delete objCookies[key];                 
@@ -116,15 +120,19 @@ listTable.addEventListener('click', function(e) {
 });
 
 function getCookies() {
-    let obj = document.cookie.split('; ').reduce((prev, current) => {
-        const [name, value] = current.split('=');
-
-        prev[name] = value;
-
-        return prev;
-    }, {});    
-
-    return obj;
+    let obj = {};
+    
+    if (document.cookie) {
+        obj = document.cookie.split('; ').reduce((prev, current) => {
+            const [name, value] = current.split('=');
+    
+            prev[name] = value;
+    
+            return prev;
+        }, {});        
+    } 
+    
+    return obj;    
 }
 
 function addRow(name, value) {
