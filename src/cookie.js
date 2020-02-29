@@ -50,23 +50,8 @@ filterNameInput.addEventListener('keyup', function() {
     // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
     let filterValue = filterNameInput.value; 
 
-    objCookies = getCookies();  
-    
-    listTable.innerHTML = '';    
-    
-    if (filterValue === '') {
-        for (let key in objCookies) {
-            if (objCookies.hasOwnProperty(key)) {
-                addRow(key, objCookies[key]);            
-            }                       
-        }
-    } else {
-        for (let key in objCookies) {            
-            if (key.includes(filterValue) || objCookies[key].includes(filterValue)) {
-                addRow(key, objCookies[key]);                
-            }
-        }
-    }    
+    listTable.innerHTML = '';     
+    buildTable(filterValue);
 });
 
 addButton.addEventListener('click', () => {
@@ -87,24 +72,8 @@ addButton.addEventListener('click', () => {
         document.cookie = `${name}=${value}`;        
     }     
 
-    listTable.innerHTML = '';
-    
-    if (filterValue === '') {
-    
-        for (let key in objCookies) { 
-            if (objCookies.hasOwnProperty(key)) {
-                addRow(key, objCookies[key]);            
-            }       
-        }
-    } else {
-        for (let key in objCookies) {
-            
-            if (key.includes(filterValue) || objCookies[key].includes(filterValue)) {
-                addRow(key, objCookies[key]); 
-            }                  
-        }
-    }
-    
+    listTable.innerHTML = '';    
+    buildTable(filterValue);    
 });
 
 listTable.addEventListener('click', function(e) {
@@ -141,10 +110,22 @@ function addRow(name, value) {
     listTable.innerHTML += row;
 }
 
-objCookies = getCookies();
+function buildTable(value) {
+    objCookies = getCookies();
 
-for (let key in objCookies) {
-    if (key) {
-        addRow(key, objCookies[key]);
-    }    
+    if (value) {
+        for (let key in objCookies) {            
+            if (key.includes(value) || objCookies[key].includes(value)) {
+                addRow(key, objCookies[key]); 
+            }                  
+        } 
+    } else {
+        for (let key in objCookies) { 
+            if (objCookies.hasOwnProperty(key)) {
+                addRow(key, objCookies[key]);            
+            }       
+        }
+    }
 }
+
+buildTable(filterNameInput.value);
